@@ -23,26 +23,36 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 describe('ProductDetailsComponent', () => {
   let component: ProductDetailsComponent;
   let fixture: ComponentFixture<ProductDetailsComponent>;
-  let productServiceSpy: jasmine.SpyObj<ProductService>;
+  let productServiceMock: Partial<ProductService>;
   let router: Router;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let navigateByUrlSpy: jasmine.Spy;
+  let dialogMock: Partial<MatDialog>;
+  let storeMock: Partial<Store>;
+  let navigateByUrlSpy: jest.SpyInstance;
 
   beforeEach(async () => {
-    productServiceSpy = jasmine.createSpyObj('ProductService', [
-      'getProduct',
-      'updateProduct',
-      'deleteProduct',
-    ]);
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    productServiceMock = { 
+      getProduct: jest.fn(),
+      updateProduct: jest.fn(),
+      deleteProduct: jest.fn(),
+    };
+     
+    dialogMock = {
+      open: jest.fn().mockReturnValue({ afterClosed: () => of(true) }),
+    };
+    
+    storeMock = {
+      dispatch: jest.fn(),
+    };
+
     const mockProduct: Product = {
       id: 1,
       name: 'Mock Product',
       description: 'Mock Description',
       price: 10.99,
     };
-    productServiceSpy.getProduct.and.returnValue(of(mockProduct));
 
+    (productServiceMock.getProduct as jest.Mock).mockReturnValue(of(mockProduct));
+    
     await TestBed.configureTestingModule({
       imports: [
         ProductDetailsComponent,
@@ -55,21 +65,21 @@ describe('ProductDetailsComponent', () => {
         MatCardModule,
       ],
       providers: [
-        { provide: ProductService, useValue: productServiceSpy },
-        { provide: MatDialog, useValue: dialogSpy },
+        { provide: ProductService, useValue: productServiceMock },
+        { provide: MatDialog, useValue: dialogMock },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: new Map().set('id', 1) } },
         },
-        { provide: Router, useValue: { navigateByUrl: {} } },
-        { provide: Store, useValue: { dispatch: jasmine.createSpy() } },
+        { provide: Router, useValue: { navigateByUrl: jest.fn() } },
+        { provide: Store, useValue: storeMock },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductDetailsComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
-    navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.returnValue(
+    navigateByUrlSpy = jest.spyOn(router, 'navigateByUrl').mockReturnValue(
       Promise.resolve(true)
     );
     fixture.detectChanges();
@@ -86,11 +96,11 @@ describe('ProductDetailsComponent', () => {
       description: 'Test Description',
       price: 20,
     };
-    productServiceSpy.getProduct.and.returnValue(of(dummyProduct));
+    (productServiceMock.getProduct as jest.Mock).mockReturnValue(of(dummyProduct));
 
     component.ngOnInit();
 
-    expect(component.loading).toBeFalse();
+    expect(component.loading).toBeFalsy();
     expect(component.product).toEqual(dummyProduct);
     expect(component.productForm.value).toEqual({
       name: dummyProduct.name,
@@ -100,7 +110,7 @@ describe('ProductDetailsComponent', () => {
   });
 
   it('should call resizeToFitContent on autosize when triggerResize is called', fakeAsync(() => {
-    const resizeToFitContentSpy = spyOn(
+    const resizeToFitContentSpy = jest.spyOn(
       component.autosize,
       'resizeToFitContent'
     );
@@ -122,7 +132,7 @@ describe('ProductDetailsComponent', () => {
       description: 'Updated Test Description',
       price: 25,
     };
-    productServiceSpy.updateProduct.and.returnValue(of(dummyProduct));
+    (productServiceMock.updateProduct as jest.Mock).mockReturnValue(of(dummyProduct));
     component.product = {
       id: 1,
       name: 'Test Product',
@@ -133,8 +143,8 @@ describe('ProductDetailsComponent', () => {
 
     component.saveProduct();
 
-    expect(component.loading).toBeFalse();
-    expect(productServiceSpy.updateProduct).toHaveBeenCalled();
+    expect(component.loading).toBeFalsy();
+    expect(productServiceMock.updateProduct).toHaveBeenCalled();
     // Form should be reset
     expect(component.productForm.value).toEqual({
       name: null,
@@ -145,7 +155,7 @@ describe('ProductDetailsComponent', () => {
   });
 
   it('should handle error while saving product', () => {
-    productServiceSpy.updateProduct.and.returnValue(throwError(() => 'Error'));
+    (productServiceMock.updateProduct as jest.Mock).mockReturnValue(throwError(() => 'Error'));
     component.productForm.setValue({
       name: 'Updated Test Product',
       description: 'Updated Test Description',
@@ -154,7 +164,7 @@ describe('ProductDetailsComponent', () => {
 
     component.saveProduct();
 
-    expect(component.loading).toBeFalse();
+    expect(component.loading).toBeFalsy();
     expect(component.productForm.value).toEqual({
       name: 'Updated Test Product',
       description: 'Updated Test Description',
@@ -169,40 +179,40 @@ describe('ProductDetailsComponent', () => {
   });
 
   it('should delete product', () => {
-    dialogSpy.open.and.returnValue({
+    (dialogMock.open as jest.Mock).mockReturnValue({
       afterClosed: () => of(true),
     } as MatDialogRef<any, any>);
     const dummyProduct = { id: 1 } as Product;
-    productServiceSpy.deleteProduct.and.returnValue(of(dummyProduct));
+    (productServiceMock.deleteProduct as jest.Mock).mockReturnValue(of(dummyProduct));
     component.product = dummyProduct;
 
     component.deleteProduct();
 
-    expect(component.loading).toBeFalse();
+    expect(component.loading).toBeFalsy();
     expect(navigateByUrlSpy).toHaveBeenCalledWith('/');
   });
 
   it('should not delete product when dialog is closed', () => {
-    dialogSpy.open.and.returnValue({
+    (dialogMock.open as jest.Mock).mockReturnValue({
       afterClosed: () => of(false),
     } as MatDialogRef<any, any>);
 
     component.deleteProduct();
 
-    expect(component.loading).toBeFalse();
-    expect(productServiceSpy.deleteProduct).not.toHaveBeenCalled();
+    expect(component.loading).toBeFalsy();
+    expect(productServiceMock.deleteProduct).not.toHaveBeenCalled();
     expect(navigateByUrlSpy).not.toHaveBeenCalled();
   });
 
   it('should handle error while deleting product', () => {
-    dialogSpy.open.and.returnValue({
+    (dialogMock.open as jest.Mock).mockReturnValue({
       afterClosed: () => of(true),
     } as MatDialogRef<any, any>);
-    productServiceSpy.deleteProduct.and.returnValue(throwError('Error'));
+    (productServiceMock.deleteProduct as jest.Mock).mockReturnValue(throwError(() => 'Error'));
 
     component.deleteProduct();
 
-    expect(component.loading).toBeFalse();
+    expect(component.loading).toBeFalsy();
     expect(navigateByUrlSpy).not.toHaveBeenCalled();
   });
 });

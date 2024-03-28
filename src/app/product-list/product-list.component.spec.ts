@@ -17,14 +17,16 @@ describe('ProductListComponent', () => {
   let fixture: ComponentFixture<ProductListComponent>;
   let router: Router;
   let store: MockStore;
-  let productServiceSpy: jasmine.SpyObj<ProductService>;
+  let productServiceMock: Partial<ProductService>;
   const mockProducts: Product[] = [
     { id: 1, name: 'Product 1', description: 'Description 1', price: 10 },
     { id: 2, name: 'Product 2', description: 'Description 2', price: 20 },
   ];
 
   beforeEach(async () => {
-    productServiceSpy = jasmine.createSpyObj('ProductService', ['getProducts']);
+    productServiceMock = {
+      getProducts: jest.fn().mockReturnValue(of(mockProducts)),
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -35,9 +37,9 @@ describe('ProductListComponent', () => {
         MatIconModule,
       ],
       providers: [
-        { provide: Router, useValue: { navigateByUrl: jasmine.createSpy() } }, 
-        { provide: Store, useValue: { dispatch: jasmine.createSpy() } }, 
-        { provide: ProductService, useValue: productServiceSpy }, 
+        { provide: Router, useValue: { navigateByUrl: jest.fn() } },
+        { provide: Store, useValue: { dispatch: jest.fn() } },
+        { provide: ProductService, useValue: productServiceMock },
       ],
     }).compileComponents();
 
@@ -48,7 +50,6 @@ describe('ProductListComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProductListComponent);
     component = fixture.componentInstance;
-    productServiceSpy.getProducts.and.returnValue(of(mockProducts));
     fixture.detectChanges();
   });
 
@@ -56,10 +57,10 @@ describe('ProductListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load products on initialization', () => {
+  it('should load products on initialization', (done) => {
     expect(component.products$).toBeDefined();
     expect(component.products$ instanceof Observable).toBe(true);
-    component.products$!.subscribe(products => {
+    component.products$!.subscribe((products) => {
       expect(products.length).toEqual(mockProducts.length);
       const sortedProducts = products.sort((a, b) => a.id - b.id);
       sortedProducts.forEach((product, index) => {
@@ -68,11 +69,14 @@ describe('ProductListComponent', () => {
         expect(product.description).toEqual(mockProducts[index].description);
         expect(product.price).toEqual(mockProducts[index].price);
       });
+      done();
     });
   });
 
   it('should dispatch updateHeaderTitle action with correct title', () => {
-    expect(store.dispatch).toHaveBeenCalledWith(fromActions.updateHeaderTitle({ title: 'Products' }));
+    expect(store.dispatch).toHaveBeenCalledWith(
+      fromActions.updateHeaderTitle({ title: 'Products' })
+    );
   });
 
   it('should navigate to edit product route when editProduct is called', () => {

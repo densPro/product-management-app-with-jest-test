@@ -19,11 +19,13 @@ describe('AddProductComponent', () => {
   let fixture: ComponentFixture<AddProductComponent>;
   let router: Router;
   let store: MockStore;
-  let productServiceSpy: jasmine.SpyObj<ProductService>;
-  let navigateByUrlSpy: jasmine.Spy;
+  let productServiceMock: Partial<ProductService>;
+  let navigateByUrlSpy: jest.SpyInstance;
 
   beforeEach(async () => {
-    productServiceSpy = jasmine.createSpyObj('ProductService', ['addProduct']);
+    productServiceMock = {
+      addProduct: jest.fn().mockReturnValue(of({})),
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -37,9 +39,9 @@ describe('AddProductComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Router, useValue: { navigateByUrl: {} } },
-        { provide: Store, useValue: { dispatch: jasmine.createSpy() } },
-        { provide: ProductService, useValue: productServiceSpy },
+        { provide: Router, useValue: { navigateByUrl: jest.fn() } },
+        { provide: Store, useValue: { dispatch: jest.fn() } },
+        { provide: ProductService, useValue: productServiceMock },
       ],
     }).compileComponents();
 
@@ -50,7 +52,7 @@ describe('AddProductComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AddProductComponent);
     component = fixture.componentInstance;
-    navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.returnValue(
+    navigateByUrlSpy = jest.spyOn(router, 'navigateByUrl').mockReturnValue(
       Promise.resolve(true)
     );
     fixture.detectChanges();
@@ -75,7 +77,7 @@ describe('AddProductComponent', () => {
     });
 
     // Mock the addProduct method of the ProductService to return an observable of object with next method
-    productServiceSpy.addProduct.and.returnValue(
+    (productServiceMock.addProduct as jest.Mock).mockReturnValue(
       of({
         next: (response: any) => {        }
       })
@@ -84,16 +86,16 @@ describe('AddProductComponent', () => {
     component.addProduct();
     tick();
 
-    expect(component.loading).toBeFalse(); 
+    expect(component.loading).toBeFalsy(); 
     expect(navigateByUrlSpy).toHaveBeenCalledWith('/'); 
-    expect(productServiceSpy.addProduct).toHaveBeenCalled();
+    expect(productServiceMock.addProduct).toHaveBeenCalled();
   }));
 
   it('should set loading to false on error', () => {
-    productServiceSpy.addProduct.and.returnValue(
+    (productServiceMock.addProduct as jest.Mock).mockReturnValue(
       of({}).pipe(
         catchError((error) => {
-          expect(component.loading).toBeFalse(); // Ensure loading flag is set to false
+          expect(component.loading).toBeFalsy(); // Ensure loading flag is set to false
           return throwError(() =>error);
         })
       )
@@ -107,7 +109,7 @@ describe('AddProductComponent', () => {
 
     component.addProduct();
 
-    expect(component.productForm.touched).toBeTrue(); // Ensure all form controls are marked as touched
+    expect(component.productForm.touched).toBeTruthy(); // Ensure all form controls are marked as touched
   });
 
   it('should navigate to home page on cancel', () => {
