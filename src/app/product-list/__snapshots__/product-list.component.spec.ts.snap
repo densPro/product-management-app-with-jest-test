@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProductListComponent should match snapshot 1`] = `
+<div
+  id="root1"
+>
+  <div
+    class="product-list"
+  >
+    <mat-card
+      class="mat-mdc-card mdc-card product-card"
+    >
+      <mat-card-header
+        class="mat-mdc-card-header"
+      >
+        <div
+          class="mat-mdc-card-header-text"
+        >
+          <mat-card-title
+            class="mat-mdc-card-title"
+          >
+            Product 2
+          </mat-card-title>
+        </div>
+      </mat-card-header>
+      <mat-card-content
+        class="mat-mdc-card-content"
+      >
+        <p>
+          Description 2
+        </p>
+        <mat-card-subtitle
+          class="mat-mdc-card-subtitle"
+        >
+          $20
+        </mat-card-subtitle>
+      </mat-card-content>
+      <mat-card-actions
+        class="mat-mdc-card-actions mdc-card__actions action-buttons"
+      >
+        <button
+          class="mdc-icon-button mat-mdc-icon-button mat-unthemed mat-mdc-button-base"
+          mat-icon-button=""
+          mat-ripple-loader-centered=""
+          mat-ripple-loader-class-name="mat-mdc-button-ripple"
+          mat-ripple-loader-uninitialized=""
+        >
+          <span
+            class="mat-mdc-button-persistent-ripple mdc-icon-button__ripple"
+          />
+          <mat-icon
+            aria-hidden="true"
+            class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"
+            data-mat-icon-type="font"
+            role="img"
+          >
+            edit
+          </mat-icon>
+          <span
+            class="mat-mdc-focus-indicator"
+          />
+          <span
+            class="mat-mdc-button-touch-target"
+          />
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    <mat-card
+      class="mat-mdc-card mdc-card product-card"
+    >
+      <mat-card-header
+        class="mat-mdc-card-header"
+      >
+        <div
+          class="mat-mdc-card-header-text"
+        >
+          <mat-card-title
+            class="mat-mdc-card-title"
+          >
+            Product 1
+          </mat-card-title>
+        </div>
+      </mat-card-header>
+      <mat-card-content
+        class="mat-mdc-card-content"
+      >
+        <p>
+          Description 1
+        </p>
+        <mat-card-subtitle
+          class="mat-mdc-card-subtitle"
+        >
+          $10
+        </mat-card-subtitle>
+      </mat-card-content>
+      <mat-card-actions
+        class="mat-mdc-card-actions mdc-card__actions action-buttons"
+      >
+        <button
+          class="mdc-icon-button mat-mdc-icon-button mat-unthemed mat-mdc-button-base"
+          mat-icon-button=""
+          mat-ripple-loader-centered=""
+          mat-ripple-loader-class-name="mat-mdc-button-ripple"
+          mat-ripple-loader-uninitialized=""
+        >
+          <span
+            class="mat-mdc-button-persistent-ripple mdc-icon-button__ripple"
+          />
+          <mat-icon
+            aria-hidden="true"
+            class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"
+            data-mat-icon-type="font"
+            role="img"
+          >
+            edit
+          </mat-icon>
+          <span
+            class="mat-mdc-focus-indicator"
+          />
+          <span
+            class="mat-mdc-button-touch-target"
+          />
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    
+    <button
+      class="add-button mdc-fab mat-mdc-fab mat-primary mat-mdc-button-base"
+      color="primary"
+      mat-fab=""
+      mat-ripple-loader-class-name="mat-mdc-button-ripple"
+      mat-ripple-loader-uninitialized=""
+    >
+      <span
+        class="mat-mdc-button-persistent-ripple mdc-fab__ripple"
+      />
+      <mat-icon
+        aria-hidden="true"
+        class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"
+        data-mat-icon-type="font"
+        role="img"
+      >
+        add
+      </mat-icon>
+      <span
+        class="mdc-button__label"
+      />
+      <span
+        class="mat-mdc-focus-indicator"
+      />
+      <span
+        class="mat-mdc-button-touch-target"
+      />
+    </button>
+  </div>
+</div>
+`;

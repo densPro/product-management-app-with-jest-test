@@ -57,6 +57,10 @@ describe('ProductListComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should match snapshot', () => {
+    expect(fixture.debugElement.nativeElement).toMatchSnapshot();
+  });
+
   it('should load products on initialization', (done) => {
     expect(component.products$).toBeDefined();
     expect(component.products$ instanceof Observable).toBe(true);
